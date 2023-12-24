@@ -30,6 +30,9 @@ const config = {
         next_audio_volume: 0.5,
         // 音效播放速度，1 为原速
         next_audio_rate: 1,
+
+        // 主题
+        live_theme: 'vanilla'
     },
 
     // 编辑器相关配置
