@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Echo Live 编辑器</title>
-    <link rel="icon" href="res/image/favicon.ico">
-    <link rel="stylesheet" href="res/style/fh-ui.css">
-    <link rel="stylesheet" href="res/style/editor.css">
-    <script src="lib/jquery-1.7.2.min.js"></script>
-    <script src="config.js"></script>
-    <script src="res/class/EditorConstructor.js"></script>
+    <!-- <link rel="icon" href="favicon.ico"> -->
+    <!-- 由于tauri选择性打包会将文件放置在app内的根目录，所以将文件全部指向根目录 -->
+    <link rel="stylesheet" href="fh-ui.css">
+    <link rel="stylesheet" href="editor.css">
+    <script src="jquery-1.7.2.min.js"></script>
+    <!-- <script src="config.js"></script> -->
+    <script src="EditorConstructor.js"></script>
 </head>
 <body>
     <main>
@@ -40,6 +41,7 @@
                 accesskey="3"
                 title="编辑配置 [alt+3]"
             >配置</button>
+            <!-- 隐藏输出 -->
             <button
                 id="tabpage-nav-output"
                 class="tabpage-nav-item"
@@ -48,6 +50,7 @@
                 aria-selected="false"
                 accesskey="4"
                 title="输出代码 [alt+4]"
+                style="display: none;"
             >输出</button>
         </nav>
         <!-- 标签页面板 -->
@@ -300,6 +303,7 @@
         </div>
     </main>
 
-    <script src="res/script/editor.js"></script>
+    <!-- 由于tauri选择性打包会将文件放置在app内的根目录，所以将文件全部指向根目录 -->
+    <script src="editor.js"></script>
 </body>
 </html>
