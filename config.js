@@ -25,6 +25,19 @@ const config = {
         broadcast_enable: true,
         // 广播频道，如果您不知道这是什么请不要动它
         broadcast_channel: 'sheep-realms:echolive',
+        // 启用 WebSocket
+        // * 如果没人要求您这么做，请不要动它。
+        // * 广播模式下启用 WebSocket 可连接至服务器以从第三方软件获取消息。
+        // * 可从服务器接收的消息和广播消息一致，发送的消息须使用类似于 JSON.stringify 的方法序列化。
+        // * 详见：https://sheep-realms.github.io/Echo-Live-Doc/dev/broadcast/
+        websocket_enable: false,
+        // WebSocket 连接地址
+        websocket_url: 'ws://127.0.0.1:3000',
+        // 启用实验性 API
+        // * 实验性 API 包含了一些危险操作，实现一些特殊功能可能是必要的，但如果使用不当可能会造成严重后果。
+        // * 请开发者注意，如果您提供的产品需要启用此实验性 API，请务必说明您不得不这么做的原因。
+        // * 请用户注意，如果您使用的第三方软件要求您启用实验性 API 而未说明理由，非常不推荐您照做。
+        experimental_api_enable: false,
 
 
         // == 消息轮询 ==
@@ -67,8 +80,19 @@ const config = {
         // 音效播放速度，1 为原速
         next_audio_rate: 1,
 
+        // == 未使用配置 ==
+        // * 以下配置是为未来的新功能开发占坑的，目前没有作用。
+        // * 二次开发请注意：如果这些配置内容不符合您的预期，请不要使用这些配置名，以防止冲突。
         // 主题
-        live_theme: 'vanilla'
+        live_theme: 'vanilla',
+        next_effect_name: 'none',
+        next_effect_duration: 0,
+        print_effect_name: 'none',
+        print_effect_duration: 0,
+        print_start_effect_name: 'none',
+        print_start_effect_duration: 0,
+        print_end_effect_name: 'none',
+        print_end_effect_duration: 0,
     },
 
     // 编辑器相关配置
@@ -82,6 +106,14 @@ const config = {
         tabpage_config_enable: true,
         // 显示输出标签页
         tabpage_output_enable: true,
+
+
+        // 显示对话框状态仪表板
+        // * 仪表板可以显示所有对话框的状态，绿色为激活，红色为休眠，灰色则表示没有对话框加入频道。
+        // * 如果您添加了多个对话框，建议您启用此项。
+        // * 如果您是红绿色盲，请在下方无障碍相关配置中启用红绿色盲。
+        // ** 启用后，蓝色填充为激活，蓝色边框为休眠。
+        client_state_panel_enable: false,
 
 
         // == 表单预填充 ==
@@ -98,6 +130,23 @@ const config = {
         // 启用上述功能，0 为禁用，1 为启用
         ontput_after_enable: 1,
     }
+    },
+
+    // 无障碍相关配置
+    // * 编辑器支持键盘访问。
+    accessible: {
+        // 高对比度
+        high_contrast: false,
+        // 红绿色盲
+        drotanopia_and_deuteranopia: false,
+    },
+
+    // == 未使用配置 ==
+    // * 以下配置是为未来的新功能开发占坑的，目前没有作用。
+    // * 二次开发请注意：如果这些配置内容不符合您的预期，请不要使用这些配置名，以防止冲突。
+    history: {},
+    selector: {},
+    character: {},
 };
 
 // ===== 这里是配置文件的末尾 =============================================================

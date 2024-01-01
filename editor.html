@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Echo Live 编辑器</title>
     <!-- <link rel="icon" href="favicon.ico"> -->
-    <!-- 由于tauri选择性打包会将文件放置在app内的根目录，所以将文件全部指向根目录 -->
     <link rel="stylesheet" href="fh-ui.css">
     <link rel="stylesheet" href="editor.css">
+    <link rel="stylesheet" href="editor-accessible.css">
     <script src="jquery-1.7.2.min.js"></script>
     <!-- <script src="config.js"></script> -->
     <script src="res/class/EchoLiveBroadcast.js"></script>
@@ -82,6 +82,13 @@
             <section class="tabpage-panel" role="tabpanel" data-pageid="ptext">
                 <h2 class="tabpage-panel-title">纯文本</h2>
                 <div class="echo-editor-from">
+                    <div class="echo-live-client-state hide">
+                        <label>对话框状态</label>
+                        <div class="echo-live-client-state-content">
+                            <div class="echo-live-client-state-block"></div>
+                        </div>
+                    </div>
+
                     <label for="character">说话人</label>
                     <input type="text" name="character" id="ptext-character">
 
@@ -321,6 +328,7 @@
                     <textarea name="content" id="output-content" class="code" aria-label="输出内容编辑框"></textarea>
                     <div class="editor-controller-bottom fh-flex-row">
                         <button id="output-btn-clear" class="fh-button fh-big fh-danger">清空</button>
+                        <button id="output-btn-send" class="fh-button fh-big hide">发送</button>
                     </div>
                 </div>
             </section>
@@ -336,7 +344,7 @@
             <!-- 日志标签页 -->
             <section class="tabpage-panel hide" role="tabpanel" data-pageid="log">
                 <h2 class="tabpage-panel-title">日志</h2>
-                <div id="editor-log">
+                <div id="editor-log" aria-label="这里是日志列表，如果您听到了这句话，请注意，这里的阅读体验可能会很差。">
                     
                 </div>
             </section>

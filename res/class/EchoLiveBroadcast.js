@@ -3,12 +3,14 @@ class EchoLiveBroadcast {
         this.echolive = echolive;
         this.uuid = undefined;
         this.broadcast = new BroadcastChannel(channel);
+        this.websocket = undefined;
         this.isServer = true;
         this.clients = [];
         this.timer = {
             noClient: -1
         }
         this.event = {
+            clientsChange: function() {},
             message: function() {},
             noClient: function() {}
         };
@@ -21,6 +23,22 @@ class EchoLiveBroadcast {
             window.onunload = function() {
                 that.close();
             };
+
+            if (this.echolive.config.echolive.websocket_enable) {
+                this.websocket = new WebSocket(this.echolive.config.echolive.websocket_url);
+
+                this.websocket.addEventListener('open', (e) => {
+                    this.sendHello('@__server');
+                });
+
+                this.websocket.addEventListener('message', (e) => {
+                    this.getData(JSON.parse(e.data));
+                });
+
+                this.websocket.addEventListener('close', (e) => {
+                    this.websocket = undefined;
+                });
+            }
 
             this.sendHello();
         }
@@ -41,11 +59,21 @@ class EchoLiveBroadcast {
     }
 
     sendData(data = {}, type = 'message_data', target = undefined) {
-        return this.broadcast.postMessage({
+        let d = {
             action: type,
             target: target,
             data: data
-        });
+        };
+
+        this.broadcast.postMessage(d);
+        if (this.websocket != undefined) {
+            try {
+                this.websocket.send(JSON.stringify(d));
+            } catch (error) {
+                
+            }
+        }
+        return d;
     }
 
     sendHello(target = undefined) {
@@ -94,23 +122,49 @@ class EchoLiveBroadcast {
         return this.broadcast.close();
     }
 
-    addClient(uuid) {
+    addClient(uuid, hidden = false) {
         if (!this.isServer) return;
-        if (this.clients.indexOf(uuid) != -1) return;
+        let i = this.clients.findIndex(function(e) {
+            return e.uuid == uuid;
+        });
+        if (i != -1) return;
         clearTimeout(this.timer.noClient);
-        return this.clients.push(uuid);
+
+        let r = this.clients.push({
+            uuid: uuid,
+            hidden: hidden
+        });
+        this.event.clientsChange(this.clients);
+        return r; 
     }
 
     removeClient(uuid) {
         if (!this.isServer) return;
-        let i = this.clients.indexOf(uuid);
+        let i = this.clients.findIndex(function(e) {
+            return e.uuid == uuid;
+        });
         if (i == -1) return;
-        return this.clients.splice(i, 1);
+        let r = this.clients.splice(i, 1);
+        this.event.clientsChange(this.clients);
+        return r;
     }
 
-    getData(data) {
+    setClientHidden(uuid, value) {
+        if (!this.isServer) return;
+        let i = this.clients.findIndex(function(e) {
+            return e.uuid == uuid;
+        });
+        if (i == -1) return;
+        let r = this.clients[i].hidden = value;
+        this.event.clientsChange(this.clients);
+        return r;
+    }
+
+    getData(data, from = undefined) {
+        if (typeof data != 'object') return;
         this.event.message(data);
         // console.log(data);
+
         if (data.target != undefined && data.target != this.uuid) return;
 
         switch (data.action) {
@@ -119,7 +173,7 @@ class EchoLiveBroadcast {
                 break;
 
             case 'hello':
-                this.addClient(data.data.uuid);
+                this.addClient(data.data.uuid, data.data?.hidden);
                 break;
 
             case 'ping':
@@ -133,10 +187,26 @@ class EchoLiveBroadcast {
             case 'echo_next':
                 if (!this.isServer) this.echolive.next();
                 break;
+
+            case 'page_hidden':
+                this.setClientHidden(data.data.uuid, true);
+                break;
+
+            case 'page_visible':
+                this.setClientHidden(data.data.uuid, false);
+                break;
         
             default:
                 break;
         }
+    }
+
+    experimentalAPICheck(apiName) {
+        if (!this.echolive.config.echolive.experimental_api_enable) {
+            // TODO: 在这里抛出异常
+        }
+
+        return this.echolive.config.echolive.experimental_api_enable;
     }
 
     // 这是一个重复的方法，需要封装一下
