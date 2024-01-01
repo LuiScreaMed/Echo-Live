@@ -1,4 +1,6 @@
 // 警告：这是一坨屎山
+const { invoke } = window.__TAURI__.tauri;
+const { appWindow } = window.__TAURI__.window;
 
 let textList = [
     {text: ''}
