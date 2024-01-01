@@ -129,7 +129,6 @@ const config = {
         output_after: ');',
         // 启用上述功能，0 为禁用，1 为启用
         ontput_after_enable: 1,
-    }
     },
 
     // 无障碍相关配置
