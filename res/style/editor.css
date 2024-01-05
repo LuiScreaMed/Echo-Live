@@ -13,13 +13,14 @@
     --border-coler: #AAAAAA;
 }
 
-body {
-    overflow-y: scroll;
-}
-
 main {
     width: min(1000px, calc(100vw - 32px));
     margin: 0 auto;
+}
+
+expand {
+    display: block;
+    height: 100%;
 }
 
 textarea.code {
@@ -69,6 +70,22 @@ textarea.code {
     font-size: 0;
 }
 
+.tabpage-panel {
+    overflow-y: scroll;
+    width: 100%;
+    height: calc(100vh - 80px);
+}
+
+.tabpage-panel[data-pageid=log] {
+    background-color: #FFF;
+}
+
+.echo-editor-from {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .echo-editor-from label,
 .echo-editor-from textarea {
     display: block;
@@ -98,7 +115,7 @@ textarea.code {
 }
 
 .editor-controller-bottom {
-    padding: 16px 0;
+    padding: 16px 0 0;
     margin-top: -1px;
     border-top: var(--border-coler) 1px solid;
     position: sticky;
@@ -305,11 +322,9 @@ input[type=text]:focus {
 
 
 #editor-log {
-    background-color: #FFF;
     box-sizing: border-box;
     width: 100%;
-    height: calc(100vh - 80px);
-    overflow-y: scroll;
+    height: 100%;
     font-family: Monaco, Consolas, 'Lucida Console', 'Courier New', serif;
     padding: 8px;
 }

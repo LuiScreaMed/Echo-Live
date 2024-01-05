@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="editor.css">
     <link rel="stylesheet" href="editor-accessible.css">
     <script src="jquery-1.7.2.min.js"></script>
-    <!-- <script src="config.js"></script> -->
-    <script src="res/class/EchoLiveBroadcast.js"></script>
-    <script src="res/class/EditorConstructor.js"></script>
+    <script src="config.js"></script>
+    <!-- <script src="EchoLiveBroadcast.js"></script> -->
+    <script src="EditorConstructor.js"></script>
 </head>
 <body>
     <main>
@@ -52,7 +52,6 @@
                 aria-selected="false"
                 accesskey="4"
                 title="输出代码 [alt+4]"
-                style="display: none;"
             >输出</button>
             <button
                 class="tabpage-nav-item"
@@ -139,8 +138,7 @@
 
                     <div class="editor-controller-bottom fh-flex-row">
                         <button id="ptext-btn-clear" class="fh-button fh-big fh-danger">重置</button>
-                        <button id="ptext-btn-submit" class="fh-button fh-big">输出</button>
-                        <button id="ptext-btn-send" class="fh-button fh-big hide">发送</button>
+                        <button id="ptext-btn-send" class="fh-button fh-big">发送</button>
                     </div>
                 </div>
             </section>
@@ -301,7 +299,13 @@
             <section class="tabpage-panel hide" role="tabpanel" data-pageid="config">
                 <h2 class="tabpage-panel-title">配置</h2>
                 <div class="echo-editor-from">
-                    <label for="output-before">头部内容</label>
+                    <!-- 主题 -->
+                    <!-- 默认说话人 -->
+                    <!-- 打字音效，音量，速度 -->
+                    <!-- 新对话音效，音量，速度 -->
+                    <!-- 无障碍 -->
+                    <!-- 启用实验性 API -->
+                    <!-- <label for="output-before">头部内容</label>
                     <textarea name="output-before" id="config-output-before" class="code"></textarea>
                     <button role="checkbox" aria-selected="true" class="checkbox selected">
                         <span class="icon"></span>
@@ -315,9 +319,9 @@
                         <span class="icon"></span>
                         <span class="text">在输出内容之后插入尾部内容</span>
                         <input type="hidden" name="config-output-use-after" id="config-output-use-after" value="1">
-                    </button>
+                    </button> -->
                 </div>
-                <p style="color: var(--text-regular);">详细配置请见配置文件 <code>config.js</code>。</p>
+                <!-- <p style="color: var(--text-regular);">详细配置请见配置文件 <code>config.js</code>。</p> -->
             </section>
 
             <!-- 输出标签页 -->
@@ -326,9 +330,12 @@
                 <div class="echo-editor-from">
                     <label for="content">输出内容</label>
                     <textarea name="content" id="output-content" class="code" aria-label="输出内容编辑框"></textarea>
+
+                    <expand></expand>
+
                     <div class="editor-controller-bottom fh-flex-row">
                         <button id="output-btn-clear" class="fh-button fh-big fh-danger">清空</button>
-                        <button id="output-btn-send" class="fh-button fh-big hide">发送</button>
+                        <button id="output-btn-send" class="fh-button fh-big">发送</button>
                     </div>
                 </div>
             </section>

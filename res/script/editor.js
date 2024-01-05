@@ -1,6 +1,13 @@
 // 警告：这是一坨屎山
+
+// tauri接口
+// 注释内容在开发阶段用于代码提示，实际由于vanilla js，需要使下面的引入方法
+// import { invoke } from '@tauri-apps/api/tauri';
+// import { appWindow } from '@tauri-apps/api/window';
+// import { emit, listen, once } from '@tauri-apps/api/event';
 const { invoke } = window.__TAURI__.tauri;
 const { appWindow } = window.__TAURI__.window;
+const { emit, listen, once } = window.__TAURI__.event;
 
 let textList = [
     {text: ''}
@@ -8,39 +15,65 @@ let textList = [
 
 let timer = {
     clickEffect: -1
+};
+
+// 配置
+let config = configDefault;
+
+// 监听服务器状态
+let serverStatusListener = listen('server_status_changed', (status) => {
+    editorLog(`服务器状态发生改变，当前状态：${status}`);
+});
+
+// dom加载完成后获取并应用配置，然后显示窗口
+document.addEventListener('DOMContentLoaded', async () => {
+    editorLog('正在初始化配置...');
+    await initConfig();
+    console.log(config);
+    setDefaultValues();
+    editorLog('初始化配置完成。');
+    checkNowDate();
+    // 监听服务器端口变化
+    await serverStatusListener;
+    // 通知app窗口显示
+    appWindow.show();
+});
+
+// 初始化配置
+async function initConfig() {
+    try {
+        config = await invoke('get_config');
+    } catch (e) {
+        editorLog('初始化获取配置失败，使用默认配置。', 'erro');
+    }
 }
 
-setDefaultValue('#config-output-before', config.editor.output_before);
-setDefaultValue('#config-output-after', config.editor.output_after);
-$('#ptext-character, #rtext-character').val(config.editor.username_init);
-setCheckboxDefaultValue('#config-output-use-before', config.editor.ontput_before_enable);
-setCheckboxDefaultValue('#config-output-use-after', config.editor.ontput_after_enable);
+// 设置默认值
+function setDefaultValues() {
+    setDefaultValue('#config-output-before', config.editor.output_before);
+    setDefaultValue('#config-output-after', config.editor.output_after);
+    $('#ptext-character, #rtext-character').val(config.editor.username_init);
+    setCheckboxDefaultValue('#config-output-use-before', config.editor.ontput_before_enable);
+    setCheckboxDefaultValue('#config-output-use-after', config.editor.ontput_after_enable);
 
-if (!config.editor.tabpage_config_enable) $('#tabpage-nav-config').addClass('hide');
-if (!config.editor.tabpage_output_enable) $('#tabpage-nav-output').addClass('hide');
+    if (!config.editor.tabpage_config_enable) $('#tabpage-nav-config').addClass('hide');
+    if (!config.editor.tabpage_output_enable) $('#tabpage-nav-output').addClass('hide');
 
-if (config.accessible.high_contrast)  $('body').addClass('accessible-high-contrast');
-if (config.accessible.drotanopia_and_deuteranopia) $('body').addClass('accessible-drotanopia-and-deuteranopia');
+    if (config.accessible.high_contrast) $('body').addClass('accessible-high-contrast');
+    if (config.accessible.drotanopia_and_deuteranopia) $('body').addClass('accessible-drotanopia-and-deuteranopia');
 
-let elb;
+    let elb;
 
-if (config.echo.print_speed != 30) {
-    $('#ptext-ipt-print-speed, #rtext-ipt-print-speed').val(config.echo.print_speed);
-    $('.print-speed-config').text(config.echo.print_speed);
-    $('.print-speed-change').removeClass('hide');
-}
-
-if (config.echolive.broadcast_enable) {
-    $('#ptext-btn-submit').addClass('fh-ghost');
-    $('#ptext-btn-send, #output-btn-send').removeClass('hide');
-    $('#ptext-content').attr('title', '当焦点在此文本框中时，可用按下 Ctrl + Enter 快速发送');
-
-    if (config.editor.client_state_panel_enable) {
-        $('.echo-live-client-state').removeClass('hide');
+    if (config.echo.print_speed != 30) {
+        $('#ptext-ipt-print-speed, #rtext-ipt-print-speed').val(config.echo.print_speed);
+        $('.print-speed-config').text(config.echo.print_speed);
+        $('.print-speed-change').removeClass('hide');
     }
 
+    $('#ptext-content').attr('title', '当焦点在此文本框中时，可用按下 Ctrl + Enter 快速发送');
+
     // 纯文本 - 内容 - 快捷键
-    $('#ptext-content').keydown(function(e) {
+    $('#ptext-content').keydown(function (e) {
         if (e.keyCode == 13 && e.ctrlKey) {
             $('.fh-effect-click').removeClass('fh-effect-click');
             clearTimeout(timer.clickEffect)
@@ -53,32 +86,22 @@ if (config.echolive.broadcast_enable) {
             }, 1000);
         }
     })
-
-    $('.echo-live-client-state-content').html(EditorClientState.statePanel([]));
-
-    elb = new EchoLiveBroadcast(undefined, config.echolive.broadcast_channel);
-    elb.on('clientsChange', clientsChange);
-    elb.on('message', getMessage);
-    elb.on('noClient', noClient);
-
-    checkNowDate();
-    editorLog('广播模式已开启：' + config.echolive.broadcast_channel);
-    editorLog('User Agent: ' + navigator.userAgent, 'dbug');
-    if (navigator.userAgent.toLowerCase().search(/ obs\//) != -1) {
-        editorLog('编辑器已正确安装在 OBS 中！', 'done');
-    } else {
-        editorLog('您似乎并未正确在 OBS 中安装此编辑器，详见：https://sheep-realms.github.io/Echo-Live-Doc/main/how-to-use/', 'tips');
-    }
-} else {
-    checkNowDate();
-    editorLog('未开启广播模式，无日志显示。');
 }
 
+/**
+ * @description: 获取当前日期和时间
+ * @return {'yyyy-MM-dd HH:mm:ss'}
+ */
 function getTime() {
     let d = new Date();
     return `${d.getFullYear()}-${afterZero(d.getMonth() + 1)}-${afterZero(d.getDate())} ${afterZero(d.getHours())}:${afterZero(d.getMinutes())}:${afterZero(d.getSeconds())}`;
 }
 
+/**
+ * @description: 小于十补零
+ * @param {number} value 输入数字
+ * @return {string}
+ */
 function afterZero(value) {
     if (value >= 10) {
         return `${value}`;
@@ -90,6 +113,11 @@ function afterZero(value) {
 
 let logMsgMark = 0;
 
+/**
+ * @description: 输出编辑器日志
+ * @param {string} message 日志消息内容
+ * @param {'dbug' | 'tips' | 'info' | 'warn' | 'erro' | 'done'} type 日志类型
+ */
 function editorLog(message = '', type = 'info') {
     const typename = {
         'dbug': '调试：',
@@ -255,27 +283,22 @@ function ptextSubmit() {
     return d;
 }
 
-// 纯文本提交
-$('#ptext-btn-submit').click(function() {
-    let d = ptextSubmit();
-
-    $('#output-content').val(getOutputBefore() + formatJson(d) + getOutputAfter());
-    $('#tabpage-nav-output').click();
-    $('#output-content').focus();
-    $('#output-content').select();
-});
-
 // 纯文本发送
-$('#ptext-btn-send').click(function() {
+$('#ptext-btn-send').click(async function () {
     let d = ptextSubmit();
 
-    elb.sendData(d);
-
-    editorLog(`已发送纯文本消息：<${d?.username != '' ? d?.username : '<i>[未指定说话人]</i>'}> ${d.messages[0]?.message != '' ? d.messages[0]?.message : '<i>[空消息]</i>'}`);
+    try {
+        await invoke('send_echo', {
+            echo: d
+        });
+        editorLog(`已发送纯文本消息：<${d?.username != '' ? d?.username : '<i>[未指定说话人]</i>'}> ${d.messages[0]?.message != '' ? d.messages[0]?.message : '<i>[空消息]</i>'}`);
+    } catch (e) {
+        editorLog(`发送纯文本消息失败：<${d?.username != '' ? d?.username : '<i>[未指定说话人]</i>'}> ${d.messages[0]?.message != '' ? d.messages[0]?.message : '<i>[空消息]</i>'}`, "erro");
+    }
 });
 
 // 输出页发送
-$('#output-btn-send').click(function() {
+$('#output-btn-send').click(async function() {
     let before      = getOutputBefore(),
         after       = getOutputAfter(),
         centent     = $('#output-content').val(),
@@ -292,6 +315,9 @@ $('#output-btn-send').click(function() {
     }
 
     try {
+        await invoke('send_echo', {
+            echo: d
+        });
         elb.sendData(JSON.parse(newCentent));
         editorLog('已发送自定义消息。');
     } catch (error) {
