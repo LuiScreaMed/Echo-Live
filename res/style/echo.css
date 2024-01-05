@@ -12,3 +12,49 @@
 .echo-text-rock-y {
     animation: echo-text-rock-y .5s infinite;
 }
+
+#echo-live {
+    position: relative;
+}
+
+/* 连接不上sse服务器的提示样式 */
+#echo-live .mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.8);
+    text-shadow: 0 0 4px black;
+}
+
+#echo-live .mask .title {
+    font-size: 2em;
+    animation: err-text infinite 2s;
+    margin-bottom: 4px;
+}
+
+@keyframes err-text {
+    0% {
+        color: white;
+    }
+    50% {
+        color: red;
+    }
+    100% {
+        color: white;
+    }
+}
+
+#echo-live .mask .description {
+    color: white;
+    margin-top: 2px;
+}
+
+#echo-live .mask .code-block {
+    background-color: rgba(0,0,0,0.7);
+    border-radius: 4px;
+    padding: 2px;
+}
