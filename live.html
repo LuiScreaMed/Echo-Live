@@ -7,8 +7,8 @@
     <script src="lib/jquery-1.7.2.min.js"></script>
     <script src="res/class/Echo.js"></script>
     <script src="res/class/EchoLive.js"></script>
-    <script src="res/class/EchoLiveBroadcast.js"></script>
-    <!-- <script src="config.js"></script> -->
+    <!-- <script src="res/class/EchoLiveBroadcast.js"></script>/ -->
+    <script src="config.js"></script>
     <script src="res/class/Mixer.js"></script>
     <script src="res/script/sounds.js"></script>
     <script src="res/class/ExtensionManager.js"></script>
@@ -24,6 +24,13 @@
 </head>
 <body>
     <div id="echo-live">
+        <!-- 连接不上服务器的报错 -->
+        <div class="mask" style="display: none;">
+            <div class="title">无服务器连接</div>
+            <div class="description">请确认Echo Live已启动并且服务器正常开启</div>
+            <div class="description">可在 <span class="code-block">Echo Live -> 配置 -> 服务器</span> 查看服务器状态</div>
+        </div>
+
         <div class="top">
             <div class="top-left"></div>
             <div class="top-center"></div>

@@ -3,13 +3,12 @@ class EchoLive {
         this.echo = echo;
         this.config = config;
         this.data = undefined;
-        this.broadcast = undefined;
-        this.uuid = this.getUUID();
         this.hidden = false;
         this.antiFlood = false;
         this.timer = {
             messagesPolling: -1
         };
+        this.eventStream;
 
         this.init();
     }
@@ -18,32 +17,11 @@ class EchoLive {
         // 嵌套有点多了，这不好，要改
         if (this.config.echolive.sleep_enable) {
             document.addEventListener("visibilitychange", () => {
-                if (document.visibilityState === "visible") {
-                    this.hidden = false;
-                    if (this.broadcast != undefined) this.broadcast.pageVisible();
-                    if (this.timer.messagesPolling != -1) {
-                        this.antiFlood = true;
-                        this.start();
-                    }
-                } else {
-                    this.hidden = true;
-                    if (this.broadcast != undefined) this.broadcast.pageHidden();
-                    if (this.timer.messagesPolling != -1) this.stop();
-                }
+                this.hidden = document.visibilityState !== "visible";
             });
         }
 
-        if (this.config.echo.print_speed != undefined) {
-            this.echo.printSpeed = this.config.echo.print_speed;
-            this.echo.printSpeedStart = this.config.echo.print_speed;
-            this.echo.printSpeedChange = this.config.echo.print_speed;
-        }
-
-        if (this.config.echolive.broadcast_enable) {
-            this.broadcast = new EchoLiveBroadcast(this, this.config.echolive.broadcast_channel);
-        } else if (this.config.echolive.messages_polling_enable) {
-            this.start();
-        }
+        this.setEchoPrintSpeed(this.config.echo.print_speed);
     }
 
     /**
@@ -72,24 +50,27 @@ class EchoLive {
         this.echo.next();
     }
 
-    reload() {
-        if (this.hidden) return;
-        $('#start-script').remove();
-        let s = document.createElement('script');
-        s.src = `start.js`;
-        s.id = 'start-script';
-        document.body.appendChild(s);
+    /**
+     * 更新配置
+     * @param {*} config 新配置
+     */
+    updateConfig(config) {
+        this.config = config;
+
+        this.setEchoPrintSpeed(config.echo.print_speed);
+        this.setThemeStyleUrl(`res/style/live-theme/${config.echolive.live_theme}.css`);
     }
 
-    start() {
-        let that = this;
-        this.timer.messagesPolling = setInterval(function() {
-            that.reload();
-        }, this.config.echolive.messages_polling_tick);
-    }
-
-    stop() {
-        clearInterval(this.timer.messagesPolling);
+    /**
+     * 更改echo的打印速度
+     * @param {number} 打印速度
+     */
+    setEchoPrintSpeed(printSpeed) {
+        if (printSpeed != undefined) {
+            this.echo.printSpeed = printSpeed;
+            this.echo.printSpeedStart = printSpeed;
+            this.echo.printSpeedChange = printSpeed;
+        }
     }
 
     /**
@@ -99,20 +80,4 @@ class EchoLive {
     setThemeStyleUrl(url) {
         $('#echo-live-theme').attr('href', url);
     }
-
-    getUUID() {
-        let timestamp = new Date().getTime();
-        let perforNow = (typeof performance !== 'undefined' && performance.now && performance.now() * 1000) || 0;
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            let random = Math.random() * 16;
-            if (timestamp > 0) {
-                random = (timestamp + random) % 16 | 0;
-                timestamp = Math.floor(timestamp / 16);
-            } else {
-                random = (perforNow + random) % 16 | 0;
-                perforNow = Math.floor(perforNow / 16);
-            }
-            return (c === 'x' ? random : (random & 0x3) | 0x8).toString(16);
-        });
-    };
 }

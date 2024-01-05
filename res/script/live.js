@@ -1,5 +1,37 @@
+let config = configDefault;
+
+let eventSource = new EventSource("/events");
+
 let echo = new Echo();
-let echolive = new EchoLive(echo, config);
+
+let echolive = undefined;
+
+eventSource.addEventListener('message', (msg) => {
+    msg = JSON.parse(msg.data);
+    console.log(msg);
+    switch (msg.type) {
+        case "config": {
+            config = msg.data;
+            if (echolive) {
+                echolive.updateConfig(config);
+            } else {
+                echolive = new EchoLive(echo, config);
+            }
+            break;
+        }
+        case "echo": {
+            echolive?.send(msg.data);
+        }
+    }
+});
+
+eventSource.addEventListener('error', (_) => {
+    $('#echo-live .mask').css('display', 'flex');
+});
+
+eventSource.addEventListener('open', (_) => {
+    $('#echo-live .mask').css('display', 'none');
+})
 
 let data;
 
@@ -32,7 +64,7 @@ echo.on('print', function(chr) {
             printSe = true;
         }, printSeCd);
     }
-    
+
     if (first && chr != undefined) {
         first = false;
         $('.echo-output').attr('data-before', chr);

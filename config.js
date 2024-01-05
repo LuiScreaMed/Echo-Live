@@ -9,7 +9,7 @@
 // * “//” 开头的内容是注释，修改注释不会有任何影响，除非您把 “//” 删了并且还留着注释内容。
 // ======================================================================================
 
-const config = {
+const configDefault = {
     // Echo 相关配置
     echo: {
         // 滚动速度，每个字符打印循环的延迟时间（毫秒），最小值为 4
@@ -22,7 +22,7 @@ const config = {
         // * 推荐方案，基于网页之间的通信技术传递消息。
 
         // 启用广播，可通过编辑器直接发送消息，启用此项将禁用消息轮询
-        broadcast_enable: true,
+        broadcast_enable: false,
         // 广播频道，如果您不知道这是什么请不要动它
         broadcast_channel: 'sheep-realms:echolive',
         // 启用 WebSocket
@@ -44,7 +44,7 @@ const config = {
         // * 备选方案，定时监听 start.js 的内容更改。
 
         // 启用消息轮询，无需手动刷新，关闭则使用旧版手动操作
-        messages_polling_enable: true,
+        messages_polling_enable: false,
         // 消息轮询间隔（毫秒），值越小响应越快，性能消耗越高
         messages_polling_tick: 250,
 
@@ -105,7 +105,7 @@ const config = {
         // 显示配置标签页
         tabpage_config_enable: true,
         // 显示输出标签页
-        tabpage_output_enable: true,
+        tabpage_output_enable: false,
 
 
         // 显示对话框状态仪表板
@@ -122,13 +122,19 @@ const config = {
         // 初始说话人
         username_init: '',
         // 在输出内容前插入的内容
-        output_before: 'echolive.send(',
+        output_before: '',
         // 启用上述功能，0 为禁用，1 为启用
         ontput_before_enable: 1,
         // 在输出内容后插入的内容
-        output_after: ');',
+        output_after: '',
         // 启用上述功能，0 为禁用，1 为启用
         ontput_after_enable: 1,
+    },
+
+    // tauri后端服务器相关配置
+    server: {
+        // 端口号
+        port: 4388
     },
 
     // 无障碍相关配置
